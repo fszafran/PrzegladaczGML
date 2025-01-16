@@ -1,55 +1,52 @@
 import { useEffect } from 'react'
-import Map from 'ol/Map.js'
-import OSM from 'ol/source/OSM.js'
-import TileLayer from 'ol/layer/Tile.js'
-import View from 'ol/View.js'
 import '../assets/style.css'
 import gmlParser from '../utils/gmlParser'
 import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
-import { useGeographic } from 'ol/proj'
-
-
-const swapCoordinates = (coords) => {
-  const result = [];
-  for (let i = 0; i < coords.length; i += 3) {
-    result.push(coords[i + 1]); // X
-    result.push(coords[i]);     // Y
-    result.push(coords[i + 2]); // Z
-  }
-  return result;
-};
+import { Style, Fill, Stroke } from 'ol/style'
+import mapUtils from '../utils/mapUtils'
 
 const MapView = ({parsedGML}) => {
-  useEffect(() => {   
-    useGeographic()
-    const map = new Map({
-      target: 'map',
-      layers: [
-        new TileLayer({
-          source: new OSM(),
-        }),
-      ],
-      view: new View({
-        center: [19, 52],
-        zoom: 7,
-      }),
-    })
+  useEffect(() => {
+    const map = mapUtils.initializeMap()
 
     if (parsedGML && parsedGML.length > 0) {
-      const chosenSRS = gmlParser.gml3Format.srsName
-      const wgsSRS = 'EPSG:4326'
-      const features = [...parsedGML]
+      const chosenCRS = gmlParser.gml3Format.srsName
       const validFeatures = parsedGML.filter(f => f && f.getGeometry())
-      validFeatures.forEach(feature => {
-        const geometry = feature.getGeometry();
-        const coords = geometry.flatCoordinates;
-        geometry.flatCoordinates = swapCoordinates(coords);
-        geometry.transform(chosenSRS, wgsSRS)
-      });
-      console.log(features[0].getGeometry());
+      const transformedFeatures = mapUtils.transformFeaturesToWGS84(chosenCRS, validFeatures)
+      
+      const vectorSource = new VectorSource({
+        features: transformedFeatures
+      })
+      
+      const vectorLayer = new VectorLayer({
+        source: vectorSource,
+        style: new Style({
+          fill: new Fill({
+            color: 'rgba(255, 0, 0, 0.1)'
+          }),
+          stroke: new Stroke({
+            color: '#ff0000',
+            width: 2
+          })
+        })
+      })
+      
+      map.addLayer(vectorLayer)
+      
+      if (vectorSource.getExtent()) {
+        map.getView().fit(vectorSource.getExtent(), {
+          padding: [50, 50, 50, 50],
+          maxZoom: 18
+        })
+      }
+    }
 
-  }}, [parsedGML])
+    return () => {
+      map.setTarget(null)
+      map.dispose()
+    }
+  }, [parsedGML])
 }
 
 export default MapView
