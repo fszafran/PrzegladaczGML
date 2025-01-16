@@ -71,7 +71,7 @@ const parseGML = (GMLFile, setParsedGML) => {
 
       const srsCode = getSRSFromDocument(xmlDoc) || '2178'
       let epsgCode = await getValidEPSGCode(srsCode)
-
+      
       gml3Format.srsName = epsgCode
       const features = gml3Format.readFeatures(xmlDoc, {
         dataProjection: epsgCode
