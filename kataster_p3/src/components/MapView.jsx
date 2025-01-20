@@ -89,11 +89,11 @@ const MapView = ({ parsedGML }) => {
     if (parsedGML && parsedGML.length > 0) {
       const chosenCRS = gmlParser.gml3Format.srsName
       const validFeatures = parsedGML.filter((f) => f && f.getGeometry())
-      
-      const budynkiFeatures = validFeatures.filter((f)=>f.getKeys().includes('idBudynku'))
-      const dzialkiFeatures = validFeatures.filter((f)=>f.getKeys().includes('idDzialki'))
-      const uzytkiFeatures = validFeatures.filter((f)=>f.getKeys().includes('idUzytku'))
-      const konturyFeatures = validFeatures.filter((f)=>f.getKeys().includes('idUzytku'))
+      const transformedFeatures = mapUtils.transformFeaturesToWGS84(chosenCRS, validFeatures)
+      const budynkiFeatures = transformedFeatures.filter((f)=>f.getKeys().includes('idBudynku'))
+      const dzialkiFeatures = transformedFeatures.filter((f)=>f.getKeys().includes('idDzialki'))
+      const uzytkiFeatures = transformedFeatures.filter((f)=>f.getKeys().includes('idUzytku'))
+      const konturyFeatures = transformedFeatures.filter((f)=>f.getKeys().includes('idUzytku'))
       
       const vectorSource = new VectorSource({
         features: konturyFeatures,
