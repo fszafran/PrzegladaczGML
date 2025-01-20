@@ -33,3 +33,19 @@ body {
 .ol-popup-closer:after {
   content: "✖";
 }
+.layer-controls {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000; /* Panel znajdzie się nad mapą */
+  background: rgba(255, 255, 255, 0.9); /* Półprzezroczyste tło */
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Dodanie lekkiego cienia */
+}
+
+.layer-controls label {
+  display: block;
+  margin-bottom: 5px;
+  cursor: pointer;
+}

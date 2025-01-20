@@ -1,15 +1,17 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import '../assets/style.css'
 import gmlParser from '../utils/gmlParser'
-import VectorLayer from 'ol/layer/Vector'
-import VectorSource from 'ol/source/Vector'
-import { Style, Fill, Stroke } from 'ol/style'
-import Overlay from 'ol/Overlay'
 import mapUtils from '../utils/mapUtils'
+import VectorSource from 'ol/source/Vector'
+import Overlay from 'ol/Overlay' // Import brakującej klasy
 
 const MapView = ({ parsedGML }) => {
+  const [map, setMap] = useState(null)
+  const [layers, setLayers] = useState({})
+
   useEffect(() => {
-    const map = mapUtils.initializeMap()
+    const initializedMap = mapUtils.initializeMap()
+    setMap(initializedMap)
 
     const popupContainer = document.createElement('div')
     popupContainer.className = 'ol-popup'
@@ -30,18 +32,13 @@ const MapView = ({ parsedGML }) => {
       autoPan: true,
       autoPanAnimation: { duration: 250 },
     })
-    map.addOverlay(overlay)
+    initializedMap.addOverlay(overlay)
 
     const displayPopup = (feature, coordinate) => {
       const properties = feature.getProperties()
-      
-      // Dodajemy log do konsoli, żeby zobaczyć całą strukturę danych
-      console.log(properties) // Zobaczysz pełną strukturę obiektu
-      
-      // Tworzymy zmienną do przechowywania treści HTML
+      console.log(properties)
+
       let contentHTML = `<div><h3>Szczegóły działki</h3>`
-      
-      // Sprawdzamy i dodajemy odpowiednie atrybuty
       if (properties.startObiekt) {
         contentHTML += `<p><strong>Start obiektu:</strong> ${properties.startObiekt || 'Brak'}</p>`
       }
@@ -55,65 +52,70 @@ const MapView = ({ parsedGML }) => {
         const osoba = properties.egb_EGB_OsobaFizyczna
         contentHTML += `<p><strong>Imię:</strong> ${osoba.pierwszeImie || 'Brak'}</p>`
       }
-      
-      
-      // Sprawdzamy pozostałe właściwości
+
       for (const [key, value] of Object.entries(properties)) {
-        // Pomiń 'geometry', bo nie chcesz jej wyświetlać
         if (key === 'geometria') {
           continue
         }
-        // Wyświetlamy pozostałe właściwości (poza tymi, które już dodaliśmy)
         if (value && typeof value === 'object') {
-          contentHTML += `
-            <p><strong>${key}:</strong> ${JSON.stringify(value)}</p>
-          `
+          contentHTML += `<p><strong>${key}:</strong> ${JSON.stringify(value)}</p>`
         } else {
-          contentHTML += `
-            <p><strong>${key}:</strong> ${value || 'Brak'}</p>
-          `
+          contentHTML += `<p><strong>${key}:</strong> ${value || 'Brak'}</p>`
         }
       }
-      
-      // Zamykamy div
       contentHTML += `</div>`
-      
-      // Ustawiamy zawartość popup
+
       popupContent.innerHTML = contentHTML
-      
-      // Ustawiamy pozycję popup
       overlay.setPosition(coordinate)
     }
-    
 
     if (parsedGML && parsedGML.length > 0) {
       const chosenCRS = gmlParser.gml3Format.srsName
       const validFeatures = parsedGML.filter((f) => f && f.getGeometry())
       const transformedFeatures = mapUtils.transformFeaturesToWGS84(chosenCRS, validFeatures)
-      const budynkiFeatures = transformedFeatures.filter((f)=>f.getKeys().includes('idBudynku'))
-      const dzialkiFeatures = transformedFeatures.filter((f)=>f.getKeys().includes('idDzialki'))
-      const uzytkiFeatures = transformedFeatures.filter((f)=>f.getKeys().includes('idUzytku'))
-      const konturyFeatures = transformedFeatures.filter((f)=>f.getKeys().includes('idUzytku'))
-      
-      const vectorSource = new VectorSource({
-        features: konturyFeatures,
+
+      const budynkiLayer = mapUtils.createVectorLayer(
+        transformedFeatures.filter((f) => f.getKeys().includes('idBudynku')),
+        0
+      )
+      const dzialkiLayer = mapUtils.createVectorLayer(
+        transformedFeatures.filter((f) => f.getKeys().includes('idDzialki')),
+        1
+      )
+      const uzytkiLayer = mapUtils.createVectorLayer(
+        transformedFeatures.filter((f) => f.getKeys().includes('idUzytku')),
+        2
+      )
+      const konturyLayer = mapUtils.createVectorLayer(
+        transformedFeatures.filter((f) => f.getKeys().includes('idUzytku')),
+        3
+      )
+
+      initializedMap.addLayer(budynkiLayer)
+      initializedMap.addLayer(dzialkiLayer)
+      initializedMap.addLayer(uzytkiLayer)
+      initializedMap.addLayer(konturyLayer)
+
+      setLayers({
+        budynki: budynkiLayer,
+        dzialki: dzialkiLayer,
+        uzytki: uzytkiLayer,
+        kontury: konturyLayer,
       })
 
-      map.addLayer(mapUtils.createVectorLayer(dzialkiFeatures, 1)) // GREEN
-      map.addLayer(mapUtils.createVectorLayer(uzytkiFeatures, 2)) // BLUE
-      map.addLayer(mapUtils.createVectorLayer(konturyFeatures, 3)) //ORANGE
-      map.addLayer(mapUtils.createVectorLayer(budynkiFeatures, 0)) //RED
-   
+      const vectorSource = new VectorSource({
+        features: transformedFeatures,
+      })
 
       if (vectorSource.getExtent()) {
-        map.getView().fit(vectorSource.getExtent(), {
+        initializedMap.getView().fit(vectorSource.getExtent(), {
           padding: [50, 50, 50, 50],
           maxZoom: 18,
         })
       }
 
-      map.on('singleclick', (event) => {
-        map.forEachFeatureAtPixel(event.pixel, (feature) => {
+      initializedMap.on('singleclick', (event) => {
+        initializedMap.forEachFeatureAtPixel(event.pixel, (feature) => {
           const coordinate = event.coordinate
           displayPopup(feature, coordinate)
           return true
@@ -122,12 +124,60 @@ const MapView = ({ parsedGML }) => {
     }
 
     return () => {
-      map.setTarget(null)
-      map.dispose()
+      initializedMap.setTarget(null)
+      initializedMap.dispose()
       popupContainer.remove()
     }
   }, [parsedGML])
 
+  const toggleLayerVisibility = (layerKey) => {
+    const layer = layers[layerKey]
+    if (layer) {
+      const isVisible = layer.getVisible()
+      layer.setVisible(!isVisible)
+    }
+  }
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '500px' }}>
+      <div id="map" style={{ width: '100%', height: '100%' }}></div>
+      <div className="layer-controls">
+        <label>
+          <input
+            type="checkbox"
+            defaultChecked
+            onChange={() => toggleLayerVisibility('budynki')}
+          />
+          Budynki
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            defaultChecked
+            onChange={() => toggleLayerVisibility('dzialki')}
+          />
+          Działki
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            defaultChecked
+            onChange={() => toggleLayerVisibility('uzytki')}
+          />
+          Użytki
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            defaultChecked
+            onChange={() => toggleLayerVisibility('kontury')}
+          />
+          Kontury
+        </label>
+      </div>
+    </div>
+  )
+  
 }
 
 export default MapView
