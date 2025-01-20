@@ -123,6 +123,7 @@ const MapView = ({ parsedGML }) => {
       layer.setVisible(!isVisible)
     }
   }
+  
   return (
     <>
     {parsedGML && parsedGML.length > 0 && (

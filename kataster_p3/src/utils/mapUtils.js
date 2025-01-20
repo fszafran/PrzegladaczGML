@@ -89,7 +89,7 @@ const getLayersFromFeatures = (features) => {
     2
   )
   const konturyLayer = createVectorLayer(
-    features.filter((f) => f.getKeys().includes('idUzytku')),
+    features.filter((f) => f.getKeys().includes('idKonturu')),
     3
   )
   return [budynkiLayer, dzialkiLayer, uzytkiLayer, konturyLayer]
