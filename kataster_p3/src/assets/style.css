@@ -21,12 +21,14 @@ body {
   bottom: 12px;
   left: -50px;
   min-width: 280px;
+  font-size: 14px;
 }
 .ol-popup-closer {
   text-decoration: none;
   position: absolute;
   top: 2px;
   right: 8px;
+  cursor: pointer;
 }
 .ol-popup-closer:after {
   content: "✖";
