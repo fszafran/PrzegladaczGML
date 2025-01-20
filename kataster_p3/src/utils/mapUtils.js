@@ -44,10 +44,11 @@ const transformFeaturesToWGS84 = (fromCRS, features) => {
     });
     return features
 }
+
 const colors = [
-  {fill: 'rgba(255, 0, 0, 0.1)', stroke: '#ff0000'},    // Red
-  {fill: 'rgba(0, 128, 0, 0.1)', stroke: '#008000'},    // Green
-  {fill: 'rgba(0, 0, 255, 0.1)', stroke: '#0000ff'},    // Blue
+  {fill: 'rgba(255, 0, 0, 0.5)', stroke: '#ff0000'},    // Red
+  {fill: 'rgba(0, 128, 0, 0.6)', stroke: '#008000'},    // Green
+  {fill: 'rgba(0, 0, 255, 0.7)', stroke: '#0000ff'},    // Blue
   {fill: 'rgba(255, 165, 0, 0.1)', stroke: '#ffa500'}   // Orange
 ]
 

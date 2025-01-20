@@ -98,11 +98,12 @@ const MapView = ({ parsedGML }) => {
       const vectorSource = new VectorSource({
         features: konturyFeatures,
       })
-      
-      map.addLayer(mapUtils.createVectorLayer(budynkiFeatures, 0))
-      map.addLayer(mapUtils.createVectorLayer(dzialkiFeatures, 1))
-      map.addLayer(mapUtils.createVectorLayer(uzytkiFeatures, 2))
-      map.addLayer(mapUtils.createVectorLayer(konturyFeatures, 3))
+
+      map.addLayer(mapUtils.createVectorLayer(dzialkiFeatures, 1)) // GREEN
+      map.addLayer(mapUtils.createVectorLayer(uzytkiFeatures, 2)) // BLUE
+      map.addLayer(mapUtils.createVectorLayer(konturyFeatures, 3)) //ORANGE
+      map.addLayer(mapUtils.createVectorLayer(budynkiFeatures, 0)) //RED
+   
 
       if (vectorSource.getExtent()) {
         map.getView().fit(vectorSource.getExtent(), {
