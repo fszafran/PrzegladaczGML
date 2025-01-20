@@ -86,33 +86,23 @@ const MapView = ({ parsedGML }) => {
     }
     
 
-
-    
-    
-
     if (parsedGML && parsedGML.length > 0) {
       const chosenCRS = gmlParser.gml3Format.srsName
       const validFeatures = parsedGML.filter((f) => f && f.getGeometry())
-      const transformedFeatures = mapUtils.transformFeaturesToWGS84(chosenCRS, validFeatures)
-
+      
+      const budynkiFeatures = validFeatures.filter((f)=>f.getKeys().includes('idBudynku'))
+      const dzialkiFeatures = validFeatures.filter((f)=>f.getKeys().includes('idDzialki'))
+      const uzytkiFeatures = validFeatures.filter((f)=>f.getKeys().includes('idUzytku'))
+      const konturyFeatures = validFeatures.filter((f)=>f.getKeys().includes('idUzytku'))
+      
       const vectorSource = new VectorSource({
-        features: transformedFeatures,
+        features: konturyFeatures,
       })
-
-      const vectorLayer = new VectorLayer({
-        source: vectorSource,
-        style: new Style({
-          fill: new Fill({
-            color: 'rgba(255, 0, 0, 0.1)',
-          }),
-          stroke: new Stroke({
-            color: '#ff0000',
-            width: 2,
-          }),
-        }),
-      })
-
-      map.addLayer(vectorLayer)
+      
+      map.addLayer(mapUtils.createVectorLayer(budynkiFeatures, 0))
+      map.addLayer(mapUtils.createVectorLayer(dzialkiFeatures, 1))
+      map.addLayer(mapUtils.createVectorLayer(uzytkiFeatures, 2))
+      map.addLayer(mapUtils.createVectorLayer(konturyFeatures, 3))
 
       if (vectorSource.getExtent()) {
         map.getView().fit(vectorSource.getExtent(), {
@@ -121,7 +111,6 @@ const MapView = ({ parsedGML }) => {
         })
       }
 
-      // Dodanie logiki obsługi kliknięcia i wyświetlania pop-upu
       map.on('singleclick', (event) => {
         map.forEachFeatureAtPixel(event.pixel, (feature) => {
           const coordinate = event.coordinate

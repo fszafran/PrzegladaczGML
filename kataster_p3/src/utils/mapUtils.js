@@ -3,6 +3,9 @@ import Map from 'ol/Map.js'
 import OSM from 'ol/source/OSM.js'
 import TileLayer from 'ol/layer/Tile.js'
 import View from 'ol/View.js'
+import VectorLayer from 'ol/layer/Vector'
+import VectorSource from 'ol/source/Vector'
+import { Style, Fill, Stroke } from 'ol/style'
 
 const swapCoordinates = (coords) => {
     const result = []
@@ -41,5 +44,34 @@ const transformFeaturesToWGS84 = (fromCRS, features) => {
     });
     return features
 }
+const colors = [
+  {fill: 'rgba(255, 0, 0, 0.1)', stroke: '#ff0000'},    // Red
+  {fill: 'rgba(0, 128, 0, 0.1)', stroke: '#008000'},    // Green
+  {fill: 'rgba(0, 0, 255, 0.1)', stroke: '#0000ff'},    // Blue
+  {fill: 'rgba(255, 165, 0, 0.1)', stroke: '#ffa500'}   // Orange
+]
 
-export default { swapCoordinates, initializeMap, transformFeaturesToWGS84 }
+const createVectorLayer = (sourceFeatures, colorIndex) => {
+
+  const chosenColor = colors[colorIndex]
+  
+  const vectorSource = new VectorSource({
+    features: sourceFeatures,
+  })
+
+  const vectorLayer = new VectorLayer({
+    source: vectorSource,
+    style: new Style({
+      fill: new Fill({
+        color: chosenColor.fill,
+      }),
+      stroke: new Stroke({
+        color: chosenColor.stroke,
+        width: 2,
+      }),
+    }),
+  })
+  return vectorLayer
+}
+
+export default { swapCoordinates, initializeMap, transformFeaturesToWGS84, createVectorLayer }
