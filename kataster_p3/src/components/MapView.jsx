@@ -123,9 +123,12 @@ const MapView = ({ parsedGML }) => {
       layer.setVisible(!isVisible)
     }
   }
-
   return (
-    < LayerControl key={controlKey} onChange={toggleLayerVisibility} />
+    <>
+    {parsedGML && parsedGML.length > 0 && (
+      <LayerControl key={controlKey} onChange={toggleLayerVisibility} />
+    )}
+  </>
   )
   
 }
