@@ -3,15 +3,16 @@ import '../assets/style.css'
 import gmlParser from '../utils/gmlParser'
 import mapUtils from '../utils/mapUtils'
 import VectorSource from 'ol/source/Vector'
-import Overlay from 'ol/Overlay' // Import brakującej klasy
+import Overlay from 'ol/Overlay'
+import LayerControl from './LayerControl'
 
 const MapView = ({ parsedGML }) => {
-  const [map, setMap] = useState(null)
   const [layers, setLayers] = useState({})
+  const [controlKey, setControlKey] = useState(0)
 
   useEffect(() => {
-    const initializedMap = mapUtils.initializeMap()
-    setMap(initializedMap)
+    setControlKey(Date.now()) //fake state zeby zmusic layerControl do rerenderu
+    const map = mapUtils.initializeMap()
 
     const popupContainer = document.createElement('div')
     popupContainer.className = 'ol-popup'
@@ -32,7 +33,7 @@ const MapView = ({ parsedGML }) => {
       autoPan: true,
       autoPanAnimation: { duration: 250 },
     })
-    initializedMap.addOverlay(overlay)
+    map.addOverlay(overlay)
 
     const displayPopup = (feature, coordinate) => {
       const properties = feature.getProperties()
@@ -74,27 +75,12 @@ const MapView = ({ parsedGML }) => {
       const validFeatures = parsedGML.filter((f) => f && f.getGeometry())
       const transformedFeatures = mapUtils.transformFeaturesToWGS84(chosenCRS, validFeatures)
 
-      const budynkiLayer = mapUtils.createVectorLayer(
-        transformedFeatures.filter((f) => f.getKeys().includes('idBudynku')),
-        0
-      )
-      const dzialkiLayer = mapUtils.createVectorLayer(
-        transformedFeatures.filter((f) => f.getKeys().includes('idDzialki')),
-        1
-      )
-      const uzytkiLayer = mapUtils.createVectorLayer(
-        transformedFeatures.filter((f) => f.getKeys().includes('idUzytku')),
-        2
-      )
-      const konturyLayer = mapUtils.createVectorLayer(
-        transformedFeatures.filter((f) => f.getKeys().includes('idUzytku')),
-        3
-      )
+      const [budynkiLayer, dzialkiLayer, uzytkiLayer, konturyLayer] = mapUtils.getLayersFromFeatures(transformedFeatures)
 
-      initializedMap.addLayer(budynkiLayer)
-      initializedMap.addLayer(dzialkiLayer)
-      initializedMap.addLayer(uzytkiLayer)
-      initializedMap.addLayer(konturyLayer)
+      map.addLayer(budynkiLayer)
+      map.addLayer(dzialkiLayer)
+      map.addLayer(uzytkiLayer)
+      map.addLayer(konturyLayer)
 
       setLayers({
         budynki: budynkiLayer,
@@ -108,14 +94,14 @@ const MapView = ({ parsedGML }) => {
       })
 
       if (vectorSource.getExtent()) {
-        initializedMap.getView().fit(vectorSource.getExtent(), {
+        map.getView().fit(vectorSource.getExtent(), {
           padding: [50, 50, 50, 50],
           maxZoom: 18,
         })
       }
 
-      initializedMap.on('singleclick', (event) => {
-        initializedMap.forEachFeatureAtPixel(event.pixel, (feature) => {
+      map.on('singleclick', (event) => {
+        map.forEachFeatureAtPixel(event.pixel, (feature) => {
           const coordinate = event.coordinate
           displayPopup(feature, coordinate)
           return true
@@ -124,8 +110,8 @@ const MapView = ({ parsedGML }) => {
     }
 
     return () => {
-      initializedMap.setTarget(null)
-      initializedMap.dispose()
+      map.setTarget(null)
+      map.dispose()
       popupContainer.remove()
     }
   }, [parsedGML])
@@ -139,43 +125,7 @@ const MapView = ({ parsedGML }) => {
   }
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '500px' }}>
-      <div id="map" style={{ width: '100%', height: '100%' }}></div>
-      <div className="layer-controls">
-        <label>
-          <input
-            type="checkbox"
-            defaultChecked
-            onChange={() => toggleLayerVisibility('budynki')}
-          />
-          Budynki
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            defaultChecked
-            onChange={() => toggleLayerVisibility('dzialki')}
-          />
-          Działki
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            defaultChecked
-            onChange={() => toggleLayerVisibility('uzytki')}
-          />
-          Użytki
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            defaultChecked
-            onChange={() => toggleLayerVisibility('kontury')}
-          />
-          Kontury
-        </label>
-      </div>
-    </div>
+    < LayerControl key={controlKey} onChange={toggleLayerVisibility} />
   )
   
 }

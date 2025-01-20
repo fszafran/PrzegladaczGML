@@ -75,4 +75,24 @@ const createVectorLayer = (sourceFeatures, colorIndex) => {
   return vectorLayer
 }
 
-export default { swapCoordinates, initializeMap, transformFeaturesToWGS84, createVectorLayer }
+const getLayersFromFeatures = (features) => {
+  const budynkiLayer = createVectorLayer(
+    features.filter((f) => f.getKeys().includes('idBudynku')),
+    0
+  )
+  const dzialkiLayer = createVectorLayer(
+    features.filter((f) => f.getKeys().includes('idDzialki')),
+    1
+  )
+  const uzytkiLayer = createVectorLayer(
+    features.filter((f) => f.getKeys().includes('idUzytku')),
+    2
+  )
+  const konturyLayer = createVectorLayer(
+    features.filter((f) => f.getKeys().includes('idUzytku')),
+    3
+  )
+  return [budynkiLayer, dzialkiLayer, uzytkiLayer, konturyLayer]
+}
+
+export default { swapCoordinates, initializeMap, transformFeaturesToWGS84, getLayersFromFeatures }
