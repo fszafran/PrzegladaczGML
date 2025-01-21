@@ -35,10 +35,10 @@ const fetchDataFromEPSGIO = async (srsCode) => {
 }
 
 const parseEPSGDefiniton = (definition) =>{
-  let epsgCode = "EPSG2178"
+  let epsgCode = 'EPSG:2178'
   let params = '+proj=tmerc +lat_0=0 +lon_0=21 +k=0.999923 +x_0=7500000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs'
-  const re = /proj4\.defs\(["'](EPSG:\d+)["'],\s*["']([^"']+)["']\);/;
-  const match = definition.match(re);
+  const re = /proj4\.defs\(["'](EPSG:\d+)["'],\s*["']([^"']+)["']\);/
+  const match = definition.match(re)
   if(match){
     epsgCode = match[1]
     params = match[2]
