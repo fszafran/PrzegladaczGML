@@ -10,6 +10,8 @@ const MapView = ({ parsedGML }) => {
   const [layers, setLayers] = useState({})
   const [controlKey, setControlKey] = useState(0)
 
+  console.log(parsedGML)
+  
   useEffect(() => {
     setControlKey(Date.now()) //fake state zeby zmusic layerControl do rerenderu
     const map = mapUtils.initializeMap()
