@@ -10,7 +10,10 @@ const MapView = ({ parsedGML }) => {
   const [layers, setLayers] = useState({})
   const [controlKey, setControlKey] = useState(0)
 
+  
+  
   useEffect(() => {
+    
     setControlKey(Date.now()) //fake state zeby zmusic layerControl do rerenderu
     const map = mapUtils.initializeMap()
     const popupContainer = document.createElement('div')
@@ -70,8 +73,7 @@ const MapView = ({ parsedGML }) => {
     }
 
     if (parsedGML && parsedGML.length > 0) {
-      
-      mapUtils.addOwnerAttribute(parsedGML)      
+      mapUtils.addOwnerAttribute(parsedGML) 
       
       const chosenCRS = gmlParser.gml3Format.srsName
       const validFeatures = parsedGML.filter((f) => f && f.getGeometry())
