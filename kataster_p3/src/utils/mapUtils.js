@@ -144,13 +144,13 @@ const getPersonOrInstitutionDetails = (dzialkaId, features) => {
       const osobaFizyczna = features.find(
         (feature) =>
           feature.getId() === osobaFizycznaId
-      );
+      )
       if (osobaFizyczna) {
         results.push({
           typ: 'OsobaFizyczna',
           imie: osobaFizyczna.get('pierwszeImie'),
           nazwisko: osobaFizyczna.get('pierwszyCzlonNazwiska'),
-        });
+        })
       }
     }
 
@@ -159,21 +159,20 @@ const getPersonOrInstitutionDetails = (dzialkaId, features) => {
       const malzenstwo = features.find(
         (feature) =>
           feature.getId() === malzenstwoId
-      );
+      )
 
       if (malzenstwo) {
-        const osoba1Id = malzenstwo.get('OsobaFizyczna2');
-        const osoba2Id = malzenstwo.get('OsobaFizyczna3');
-
+        console.log(malzenstwo)
+        const osoba1Id = malzenstwo.get('osobaFizyczna2')?.['xlink:href']
+        const osoba2Id = malzenstwo.get('osobaFizyczna3')?.['xlink:href']
         const osoba1 = features.find(
           (feature) =>
             feature.getId() === osoba1Id
-        );
-
+        )
         const osoba2 = features.find(
           (feature) =>
             feature.getId() === osoba2Id
-        );
+        )
 
         results.push({
           typ: 'malzenstwo',
