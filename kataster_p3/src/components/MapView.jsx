@@ -10,9 +10,10 @@ const MapView = ({ parsedGML }) => {
   const [layers, setLayers] = useState({})
   const [controlKey, setControlKey] = useState(0)
 
-  console.log(parsedGML)
+  
   
   useEffect(() => {
+    
     setControlKey(Date.now()) //fake state zeby zmusic layerControl do rerenderu
     const map = mapUtils.initializeMap()
 
@@ -73,6 +74,7 @@ const MapView = ({ parsedGML }) => {
     }
 
     if (parsedGML && parsedGML.length > 0) {
+      console.log(parsedGML[0].getProperties())
       const chosenCRS = gmlParser.gml3Format.srsName
       const validFeatures = parsedGML.filter((f) => f && f.getGeometry())
       const transformedFeatures = mapUtils.transformFeaturesToWGS84(chosenCRS, validFeatures)

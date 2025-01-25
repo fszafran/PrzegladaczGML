@@ -5,7 +5,7 @@ import axios from 'axios'
 
 const gml3Format = new GML32({
   featureNS: 'ewidencjaGruntowIBudynkow:1.0',
-  featureType: ['EGB_DzialkaEwidencyjna', 'EGB_Budynek', 'EGB_KonturUzytkuGruntowego', 'EGB_KonturKlasyfikacyjny', 'EGB_OsobaFizyczna', 'EGB_Instytucja', 'EGB_Malzenstwo']
+  featureType: ['EGB_DzialkaEwidencyjna', 'EGB_Budynek', 'EGB_KonturUzytkuGruntowego', 'EGB_KonturKlasyfikacyjny','EGB_UdzialWeWlasnosci', 'EGB_OsobaFizyczna', 'EGB_Instytucja', 'EGB_Malzenstwo']
 });
 
 const getSRSFromDocument = (document) =>{
