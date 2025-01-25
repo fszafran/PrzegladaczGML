@@ -13,7 +13,6 @@ const MapView = ({ parsedGML }) => {
   useEffect(() => {
     setControlKey(Date.now()) //fake state zeby zmusic layerControl do rerenderu
     const map = mapUtils.initializeMap()
-
     const popupContainer = document.createElement('div')
     popupContainer.className = 'ol-popup'
     const popupContent = document.createElement('div')
@@ -71,6 +70,9 @@ const MapView = ({ parsedGML }) => {
     }
 
     if (parsedGML && parsedGML.length > 0) {
+      
+      mapUtils.addOwnerAttribute(parsedGML)      
+      
       const chosenCRS = gmlParser.gml3Format.srsName
       const validFeatures = parsedGML.filter((f) => f && f.getGeometry())
       const transformedFeatures = mapUtils.transformFeaturesToWGS84(chosenCRS, validFeatures)
