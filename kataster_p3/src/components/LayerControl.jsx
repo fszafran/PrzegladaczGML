@@ -33,6 +33,14 @@ const LayerControl = ({onChange}) => {
             />
             Kontury
             </label>
+            <label>
+            <input
+                type="checkbox"
+                defaultChecked
+                onChange={() => onChange('punktyGraniczne')}
+            />
+            Punkty Graniczne
+            </label>
         </div>
     )
 }

@@ -12,7 +12,9 @@ const gml3Format = new GML32({
                 'EGB_UdzialWeWlasnosci', 
                 'EGB_OsobaFizyczna', 
                 'EGB_Instytucja', 
-                'EGB_Malzenstwo']
+                'EGB_Malzenstwo',
+                'EGB_PunktGraniczny'
+              ]
 });
 
 const getSRSFromDocument = (document) =>{

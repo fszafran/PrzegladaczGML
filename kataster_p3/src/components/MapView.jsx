@@ -76,31 +76,32 @@ const MapView = ({ parsedGML }) => {
       mapUtils.addOwnerAttribute(parsedGML) 
       
       const chosenCRS = gmlParser.gml3Format.srsName
-      const validFeatures = parsedGML.filter((f) => f && f.getGeometry())
-      const transformedFeatures = mapUtils.transformFeaturesToWGS84(chosenCRS, validFeatures)
-
-      const [budynkiLayer, dzialkiLayer, uzytkiLayer, konturyLayer] = mapUtils.getLayersFromFeatures(transformedFeatures)
-
+      const feautesWithGeometries = parsedGML.filter((f) => f && f.getGeometry())
+      const transformedFeatures = mapUtils.transformFeaturesToWGS84(chosenCRS, feautesWithGeometries)
+      
+      const [budynkiLayer, dzialkiLayer, uzytkiLayer, konturyLayer, punktyGraniczneLayer] = mapUtils.getLayersFromFeatures(transformedFeatures)
       map.addLayer(budynkiLayer)
       map.addLayer(dzialkiLayer)
       map.addLayer(uzytkiLayer)
       map.addLayer(konturyLayer)
+      map.addLayer(punktyGraniczneLayer)
 
       setLayers({
         budynki: budynkiLayer,
         dzialki: dzialkiLayer,
         uzytki: uzytkiLayer,
         kontury: konturyLayer,
+        punktyGraniczne: punktyGraniczneLayer
       })
 
       const vectorSource = new VectorSource({
-        features: transformedFeatures,
+        features: transformedFeatures
       })
 
       if (vectorSource.getExtent()) {
         map.getView().fit(vectorSource.getExtent(), {
           padding: [50, 50, 50, 50],
-          maxZoom: 18,
+          maxZoom: 18
         })
       }
 

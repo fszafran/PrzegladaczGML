@@ -6,6 +6,7 @@ import View from 'ol/View.js'
 import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
 import { Style, Fill, Stroke } from 'ol/style'
+import CircleStyle from 'ol/style/Circle'
 
 const swapCoordinates = (coords) => {
     const result = []
@@ -52,7 +53,8 @@ const colors = [
   {fill: 'rgba(255, 0, 0, 0.5)', stroke: '#ff0000'},    // Red
   {fill: 'rgba(0, 128, 0, 0.6)', stroke: '#008000'},    // Green
   {fill: 'rgba(0, 0, 255, 0.7)', stroke: '#0000ff'},    // Blue
-  {fill: 'rgba(255, 165, 0, 0.1)', stroke: '#ffa500'}   // Orange
+  {fill: 'rgba(255, 165, 0, 0.1)', stroke: '#ffa500'},  // Orange
+  {fill: 'rgba(255, 255, 0, 0.1)', stroke: '#ffff00'}   // Yellow
 ]
 
 const createVectorLayer = (sourceFeatures, colorIndex) => {
@@ -77,8 +79,33 @@ const createVectorLayer = (sourceFeatures, colorIndex) => {
   })
   return vectorLayer
 }
+const createPointLayer = (sourceFeatures, colorIndex) => {
+  const chosenColor = colors[colorIndex]
+  const vectorSource = new VectorSource({
+    features: sourceFeatures,
+  })
+
+  const vectorLayer = new VectorLayer({
+    source: vectorSource,
+    style: new Style({
+      image: new CircleStyle({
+        radius: 6,
+        fill: new Fill({
+          color: chosenColor.fill,
+        }),
+        stroke: new Stroke({
+          color: chosenColor.stroke,
+          width: 2,
+        }),
+      }),
+    }),
+  })
+
+  return vectorLayer
+}
 
 const getLayersFromFeatures = (features) => {
+
   const budynkiLayer = createVectorLayer(
     features.filter((f) => f.getKeys().includes('idBudynku')),
     0
@@ -95,7 +122,11 @@ const getLayersFromFeatures = (features) => {
     features.filter((f) => f.getKeys().includes('idKonturu')),
     3
   )
-  return [budynkiLayer, dzialkiLayer, uzytkiLayer, konturyLayer]
+  const punktyGraniczneLayer = createPointLayer(
+    features.filter((f) => f.getKeys().includes('idPunktu')),
+    4
+  )
+  return [budynkiLayer, dzialkiLayer, uzytkiLayer, konturyLayer, punktyGraniczneLayer]
 }
 
 
