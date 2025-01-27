@@ -98,11 +98,7 @@ const MapView = ({ parsedGML }) => {
     
     
     
-    
-    
-    
-    
-
+  
     if (parsedGML && parsedGML.length > 0) {
       mapUtils.addOwnerAttribute(parsedGML) 
       
@@ -111,11 +107,12 @@ const MapView = ({ parsedGML }) => {
       const transformedFeatures = mapUtils.transformFeaturesToWGS84(chosenCRS, feautesWithGeometries)
       
       const [budynkiLayer, dzialkiLayer, uzytkiLayer, konturyLayer, punktyGraniczneLayer] = mapUtils.getLayersFromFeatures(transformedFeatures)
-      map.addLayer(budynkiLayer)
+      
       map.addLayer(dzialkiLayer)
       map.addLayer(uzytkiLayer)
       map.addLayer(konturyLayer)
       map.addLayer(punktyGraniczneLayer)
+      map.addLayer(budynkiLayer)
 
       setLayers({
         budynki: budynkiLayer,
